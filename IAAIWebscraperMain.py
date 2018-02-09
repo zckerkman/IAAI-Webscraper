@@ -37,10 +37,10 @@ def loadPage( str ):
 
 ##Calls the loadPage method on the IAAI login website and logs in, USER MUST INPUT CREDENTIALS IN THE CODE!
 def loginIAAI():
-    page = ('https://www.iaai.com/Login/LoginPage?ReturnUrl=/MyDashboard/Default')
+    loginPage = ('https://www.iaai.com/Login/LoginPage?ReturnUrl=/MyDashboard/Default')
     
     ##Runs the pageloader with the AIIA website 
-    loadPage(str = page)
+    loadPage(str = loginPage)
      
     ##Waits for the usrname field to become visible and then inputs usrname&pswrd and submits
     WebDriverWait(driver, 100).until( lambda driver: driver.find_element_by_name("usrName"))
@@ -54,13 +54,8 @@ def loginIAAI():
     pswdField.send_keys("PUT YOUR PASSWORD HERE")
     pswdField.submit()
     
-    ##Waits for the required drop down menu to load, hovers over it, and clicks the 'purchase history' icon 
-    dropDownMenu = driver.find_element_by_xpath("//nav[@id='mainNav']//a[contains(@href,'MyDashboard')]")
-    WebDriverWait(driver, 100).until( lambda driver: dropDownMenu )
-    
-    driver.move_to_element(dropDownMenu)
-    purchaseHistory = driver.find_element_by_xpath("//nav[@id='mainNav']//a[contains(@href,'PurchaseHistory')]")
-    purchaseHistory.click()
+    purchaseHistoryPage = 
+    loadPage(str = purchaseHistoryPage)
     
 def carInformation( int ):
     informationArray = []
