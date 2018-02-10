@@ -53,28 +53,70 @@ def loginIAAI():
     pswdField.click()
     pswdField.send_keys("PUT YOUR PASSWORD HERE")
     pswdField.submit()
-    
-    purchaseHistoryPage = 
+
+def returnToPurchases ():
+    ##defines the url for the purchase history page with access to cars recently purchase
+    purchaseHistoryPage = ('https://www.iaai.com/PurchaseHistory/Default')
     loadPage(str = purchaseHistoryPage)
     
 def carInformation( int ):
+    ##clickes the car we want info on with respect to the iteration number
+    driver.find_element_by_xpath('//a[@class id="stockitemID_%s"]/a[conatins(@href onclick,"return")]' % int).click
+   
+    ##creates an array to store the data in 
     informationArray = []
+    
+    ##locates and adds the vin number, car model, then scrolls to find the exterior color(seperated from the interior), and the mileage
+    vinNumber = driver.find_element_by_xpath('//div[contains(@class,"vehicle-info-wrapper")]/span[contains(@id,"VIN_vehicleStats")]').text
+    informationArray.append(vinNumber)
+    
+    carModel = driver.find_element_by_xpath('//div[@class="flex-item"]/h1[@class="pd-title-ymm"]').text
+    informationArray.append(carModel)
+    
+    carColors = driver.find_element_by_xpath('//div[@class="tabs tab-vehicle waypoint-trigger"]/div[@class="row flex"][14]/div[contains(@class,"flex-self-end")]')
+    carColors.location_once_scrolled_into_view
+    ##splits the exterior and interior colors
+    carColorsArray = carColors.text.split("/")
+    informationArray.append(carColorsArray.pop[0])
+    
+    carMileage = driver.find_element_by_xpath('//div[@class="pd-condition-wrapper]/div[@class="row flex"][4]')
+    ##removes the text after the mileage of the car
+    carMileageArray = carMileage.text.split("mi")
+    informationArray.append(carMileageArray[0])
+    
     return informationArray
     
-
-if __name__ == "__main__":
+def addToExcelSpreadsheet ( str, list ):
+    ##loads the template workbook
+    templateExcelSpreadsheet = "Cost_of_Vehicle_Format_Master.xlsx"
+    templateWorkbook = load_workbook(templateExcelSpreadsheet)
+    
+    ##adds the mileage, color, car model, and vin to their respective cells
+    templateWorkbook[''] = list.pop
+    templateWorkbook[''] = list.pop
+    templateWorkbook['B1'] = list.pop
+    templateWorkbook[''] = str
+                    
+    ##saves the excel file as the vinNumber
+    fileName = str + ".xlsx"
+    templateWorkbook.save(fileName, as_template=False)
+    
+def main():
     iterations = iterationNumber()
     loginIAAI()
     carDictionaryKey = []
     carDictionary = {}
     for x in range (0, iterations):
+        returnToPurchases()
         informationArray = carInformation( int = x )
-        value = informationArray.pop[0]
-        carDictionaryKey.append(value)
-        carDictionary[value] = informationArray
+        vinNumber = informationArray.pop[0]
+        carDictionaryKey.append(vinNumber)
+        carDictionary[vinNumber] = informationArray
 
     for keys in carDictionaryKey:
-        wb = load_workbook(filename = 'Cost_of_Vehicle_Format_Master.xls')
-        ws = wb.active
-        valueArray = carDictionaryKey[keys]
-        ws["A1"] = 
+        addToExcelSpreadsheet(str = keys, list = carDictionary[keys])
+        
+if __name__ == "__main__":
+   main()
+       
+
